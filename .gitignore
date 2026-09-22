@@ -1,0 +1,11 @@
+# NuGet packages (restore ได้จาก packages.config)
+packages/
+
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
