@@ -12,6 +12,8 @@ namespace AppHub.Scan
         public ScanForm()
         {
             InitializeComponent();
+            Theme.SetIcon(btnSave,    Theme.Icons.Save);
+            Theme.SetIcon(btnRefresh, Theme.Icons.Refresh);
             SetPlaceholder(txtCode, "Scan หรือพิมพ์รหัส...");
         }
 
@@ -44,7 +46,7 @@ namespace AppHub.Scan
 
                 if (dtCust.Rows.Count == 0)
                 {
-                    lblStatus.Text      = $"❌ ไม่พบรหัส {code} ในระบบ";
+                    lblStatus.Text      = $"✘ ไม่พบรหัส {code} ในระบบ";
                     lblStatus.ForeColor = System.Drawing.Color.Red;
                     txtCode.SelectAll();
                     txtCode.Focus();
@@ -73,7 +75,7 @@ namespace AppHub.Scan
                 SQL.Disconnect();
             }
 
-            lblStatus.Text      = $"✅ บันทึกสำเร็จ — {code} : {name}";
+            lblStatus.Text      = $"✔ บันทึกสำเร็จ — {code} : {name}";
             lblStatus.ForeColor = System.Drawing.Color.DarkGreen;
             txtCode.Clear();
             txtNote.Clear();

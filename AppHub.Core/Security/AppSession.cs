@@ -19,6 +19,11 @@ namespace AppHub.Core
         public static bool IsLoggedIn => UserId > 0;
 
         /// <summary>
+        /// มีสิทธิ์อย่างน้อย 1 module (Admin = true เสมอ)
+        /// </summary>
+        public static bool HasAnyModule => IsAdmin || _permissions.Count > 0;
+
+        /// <summary>
         /// ตั้งค่า module ที่ user มีสิทธิ์ (แทนที่ของเดิมทั้งหมด)
         /// </summary>
         public static void SetPermissions(List<string> codes)

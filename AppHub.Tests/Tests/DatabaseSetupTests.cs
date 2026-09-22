@@ -22,6 +22,13 @@ namespace AppHub.Tests
         }
 
         [TestMethod]
+        public void Users_HaveLockoutColumns()
+        {
+            Assert.AreEqual(0, TestDb.Count("SELECT SUM(Failed_login_count) FROM dbo.t_Users"));
+            Assert.AreEqual(0, TestDb.Count("SELECT COUNT(*) FROM dbo.t_Users WHERE Locked_until IS NOT NULL OR Last_login_date IS NOT NULL"));
+        }
+
+        [TestMethod]
         public void SeedPasswords_MatchAppSha256()
         {
             Assert.AreEqual(TestDb.Sha256("admin1234"),

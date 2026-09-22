@@ -69,6 +69,14 @@ namespace AppHub.Tests.Infrastructure
                     Assert.Fail("มี dialog เปิดโดยไม่คาดไว้: " + dialog.Text);
                 return DialogHandlers.Dequeue()(dialog);
             };
+            UiServices.ShowChild = (dialog, container, onClosed) =>
+            {
+                if (DialogHandlers.Count == 0)
+                    Assert.Fail("มี dialog เปิดโดยไม่คาดไว้: " + dialog.Text);
+                var result = DialogHandlers.Dequeue()(dialog);
+                onClosed(result);
+                dialog.Dispose();
+            };
             UiServices.PickOpenFile = (owner, filter, title) => OpenFilePath;
             UiServices.PickSaveFile = (owner, filter, name) => SaveFilePath;
         }

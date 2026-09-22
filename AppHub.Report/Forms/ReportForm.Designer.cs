@@ -27,7 +27,6 @@ namespace AppHub.Report
             // pnlFilter
             this.pnlFilter.Dock      = System.Windows.Forms.DockStyle.Top;
             this.pnlFilter.Height    = 78;
-            this.pnlFilter.BackColor = System.Drawing.Color.FromArgb(245, 247, 252);
             this.pnlFilter.Controls.AddRange(new System.Windows.Forms.Control[]
             {
                 this.txtSearch, this.btnSearch, this.btnClear,
@@ -38,7 +37,7 @@ namespace AppHub.Report
             this.txtSearch.Size     = new System.Drawing.Size(220, 24);
             this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
 
-            this.btnSearch.Text      = "🔍 ค้นหา";
+            this.btnSearch.Text      = "ค้นหา";
             this.btnSearch.Location  = new System.Drawing.Point(236, 8);
             this.btnSearch.Size      = new System.Drawing.Size(80, 28);
             this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -70,11 +69,11 @@ namespace AppHub.Report
             this.dtpTo.Enabled   = false;
 
             // btnExport (อยู่ใน PnlFooter ของ base ชิดขวา)
-            this.btnExport.Text      = "📄 Export CSV";
+            this.btnExport.Text      = "Export CSV";
+            this.btnExport.Tag       = "primary";
             this.btnExport.Dock      = System.Windows.Forms.DockStyle.Right;
             this.btnExport.Width     = 110;
             this.btnExport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExport.BackColor = System.Drawing.Color.FromArgb(220, 235, 255);
             this.btnExport.Click    += new System.EventHandler(this.btnExport_Click);
             this.PnlFooter.Controls.Add(this.btnExport);
 

@@ -40,10 +40,10 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ScanForm.cs">
+    <Compile Include="Forms\ScanForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ScanForm.Designer.cs">
+    <Compile Include="Forms\ScanForm.Designer.cs">
       <DependentUpon>ScanForm.cs</DependentUpon>
     </Compile>
   </ItemGroup>

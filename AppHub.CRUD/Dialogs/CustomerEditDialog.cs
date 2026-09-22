@@ -46,7 +46,6 @@ namespace AppHub.CRUD
                 Location  = new System.Drawing.Point(tx, y),
                 Size      = new System.Drawing.Size(80, 28),
                 FlatStyle = FlatStyle.Flat,
-                BackColor = System.Drawing.Color.FromArgb(220, 235, 255),
                 DialogResult = DialogResult.None
             };
             btnOk.Click += BtnOk_Click;

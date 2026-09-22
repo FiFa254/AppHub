@@ -65,13 +65,18 @@
     <Compile Include="Infrastructure\TestDb.cs" />
     <Compile Include="Infrastructure\Ui.cs" />
     <Compile Include="Infrastructure\UiTestBase.cs" />
-    <Compile Include="DatabaseSetupTests.cs" />
-    <Compile Include="LoginTests.cs" />
-    <Compile Include="UserManagementTests.cs" />
-    <Compile Include="CustomerCrudTests.cs" />
-    <Compile Include="ImportTests.cs" />
-    <Compile Include="ReportTests.cs" />
-    <Compile Include="ScanTests.cs" />
+    <Compile Include="Tests\AccountRulesTests.cs" />
+    <Compile Include="Tests\AccountSecurityTests.cs" />
+    <Compile Include="Tests\CustomerCrudTests.cs" />
+    <Compile Include="Tests\DatabaseSetupTests.cs" />
+    <Compile Include="Tests\ImportTests.cs" />
+    <Compile Include="Tests\LoginTests.cs" />
+    <Compile Include="Tests\MdiDialogTests.cs" />
+    <Compile Include="Tests\RegisterTests.cs" />
+    <Compile Include="Tests\ReportTests.cs" />
+    <Compile Include="Tests\ScanTests.cs" />
+    <Compile Include="Tests\ThemeTests.cs" />
+    <Compile Include="Tests\UserManagementTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using AppHub.Core;
 using AppHub.Core.UI;
 
 namespace AppHub.Launcher
@@ -71,7 +72,6 @@ namespace AppHub.Launcher
                 Location     = new System.Drawing.Point(tx, y),
                 Size         = new System.Drawing.Size(80, 28),
                 FlatStyle    = FlatStyle.Flat,
-                BackColor    = System.Drawing.Color.FromArgb(220, 235, 255),
                 DialogResult = DialogResult.None
             };
             btnOk.Click += BtnOk_Click;
@@ -97,6 +97,20 @@ namespace AppHub.Launcher
             {
                 ShowWarning("กรุณากรอก Username และ Password");
                 (string.IsNullOrWhiteSpace(txtUsername.Text) ? txtUsername : txtPassword).Focus();
+                return;
+            }
+            string usernameError = AccountRules.ValidateUsername(txtUsername.Text);
+            if (usernameError != null)
+            {
+                ShowWarning(usernameError);
+                txtUsername.Focus();
+                return;
+            }
+            string passwordError = AccountRules.ValidatePassword(txtPassword.Text);
+            if (passwordError != null)
+            {
+                ShowWarning(passwordError);
+                txtPassword.Focus();
                 return;
             }
             if (txtPassword.Text != txtConfirm.Text)

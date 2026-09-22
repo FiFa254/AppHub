@@ -14,7 +14,9 @@ namespace AppHub.Report
         public ReportForm()
         {
             InitializeComponent();
-            LblTitle.Text   = "📊 รายงานข้อมูลลูกค้า";
+            LblTitle.Text   = "รายงานข้อมูลลูกค้า";
+            Theme.SetIcon(btnSearch, Theme.Icons.Search);
+            Theme.SetIcon(btnExport, Theme.Icons.Export);
             dtpFrom.Value   = DateTime.Today.AddDays(-30);
             dtpTo.Value     = DateTime.Today;
             SetPlaceholder(txtSearch, "ค้นหา ชื่อ หรือ รหัส...");

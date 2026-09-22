@@ -26,6 +26,18 @@ BEGIN
 END
 GO
 
+/* ─── Users: ล็อกบัญชีเมื่อ login ผิด + เวลา login ล่าสุด (เพิ่มให้ DB เดิมด้วย) ── */
+IF COL_LENGTH(N'dbo.t_Users', N'Failed_login_count') IS NULL
+    ALTER TABLE dbo.t_Users ADD Failed_login_count INT NOT NULL
+        CONSTRAINT DF_t_Users_Failed_login_count DEFAULT (0);
+
+IF COL_LENGTH(N'dbo.t_Users', N'Locked_until') IS NULL
+    ALTER TABLE dbo.t_Users ADD Locked_until DATETIME NULL;
+
+IF COL_LENGTH(N'dbo.t_Users', N'Last_login_date') IS NULL
+    ALTER TABLE dbo.t_Users ADD Last_login_date DATETIME NULL;
+GO
+
 /* ─── Modules (รายการ module ทั้งหมดในระบบ) ────────────────────────────────── */
 IF OBJECT_ID(N'dbo.t_Modules', N'U') IS NULL
 BEGIN

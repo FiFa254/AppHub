@@ -23,18 +23,18 @@ namespace AppHub.Import
             this.SuspendLayout();
 
             // lblTitle
+            this.lblTitle.Name      = "lblTitle";
             this.lblTitle.Dock      = System.Windows.Forms.DockStyle.Top;
             this.lblTitle.Font      = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(30, 60, 120);
             this.lblTitle.Height    = 40;
             this.lblTitle.Padding   = new System.Windows.Forms.Padding(8, 0, 0, 0);
-            this.lblTitle.Text      = "📥 นำเข้าข้อมูล Excel";
+            this.lblTitle.Text      = "นำเข้าข้อมูล Excel";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 
             // pnlFile
             this.pnlFile.Dock      = System.Windows.Forms.DockStyle.Top;
             this.pnlFile.Height    = 44;
-            this.pnlFile.BackColor = System.Drawing.Color.FromArgb(245, 247, 252);
             this.pnlFile.Controls.Add(this.txtFile);
             this.pnlFile.Controls.Add(this.btnBrowse);
             this.pnlFile.Controls.Add(this.btnImport);
@@ -44,17 +44,17 @@ namespace AppHub.Import
             this.txtFile.ReadOnly  = true;
             this.txtFile.Font      = new System.Drawing.Font("Segoe UI", 9F);
 
-            this.btnBrowse.Text      = "📂 เลือกไฟล์";
+            this.btnBrowse.Text      = "เลือกไฟล์";
             this.btnBrowse.Location  = new System.Drawing.Point(416, 8);
             this.btnBrowse.Size      = new System.Drawing.Size(100, 28);
             this.btnBrowse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBrowse.Click    += new System.EventHandler(this.btnBrowse_Click);
 
-            this.btnImport.Text      = "✅ นำเข้า";
+            this.btnImport.Text      = "นำเข้า";
+            this.btnImport.Tag       = "primary";
             this.btnImport.Location  = new System.Drawing.Point(524, 8);
             this.btnImport.Size      = new System.Drawing.Size(100, 28);
             this.btnImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnImport.BackColor = System.Drawing.Color.FromArgb(200, 240, 200);
             this.btnImport.Enabled   = false;
             this.btnImport.Click    += new System.EventHandler(this.btnImport_Click);
 

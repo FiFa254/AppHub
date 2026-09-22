@@ -111,7 +111,6 @@ namespace AppHub.Launcher
                 Location     = new System.Drawing.Point(110, buttonY),
                 Size         = new System.Drawing.Size(80, 28),
                 FlatStyle    = FlatStyle.Flat,
-                BackColor    = System.Drawing.Color.FromArgb(220, 235, 255),
                 DialogResult = DialogResult.OK
             };
 

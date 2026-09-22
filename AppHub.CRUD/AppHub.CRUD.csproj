@@ -40,13 +40,13 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomerCRUDForm.cs">
+    <Compile Include="Forms\CustomerCRUDForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CustomerCRUDForm.Designer.cs">
+    <Compile Include="Forms\CustomerCRUDForm.Designer.cs">
       <DependentUpon>CustomerCRUDForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CustomerEditDialog.cs">
+    <Compile Include="Dialogs\CustomerEditDialog.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

@@ -12,7 +12,11 @@ namespace AppHub.CRUD
         public CustomerCRUDForm()
         {
             InitializeComponent();
-            LblTitle.Text = "📦 จัดการข้อมูลลูกค้า";
+            LblTitle.Text = "จัดการข้อมูลลูกค้า";
+            Theme.SetIcon(btnSearch, Theme.Icons.Search);
+            Theme.SetIcon(btnAdd,    Theme.Icons.Add);
+            Theme.SetIcon(btnEdit,   Theme.Icons.Edit);
+            Theme.SetIcon(btnDelete, Theme.Icons.Delete);
             SetPlaceholder(txtSearch, "ค้นหา ชื่อ หรือ รหัส...");
         }
 
@@ -71,46 +75,48 @@ namespace AppHub.CRUD
         // ─── Add ──────────────────────────────────────────────────────────────
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            using (var dlg = new CustomerEditDialog("เพิ่ม Customer ใหม่"))
+            var dlg = new CustomerEditDialog("เพิ่ม Customer ใหม่");
+            ShowDialogChild(dlg, () => AddCustomer(dlg));
+        }
+
+        private void AddCustomer(CustomerEditDialog dlg)
+        {
+            try
             {
-                if (ShowModal(dlg) != DialogResult.OK) return;
-                try
-                {
-                    SQL.Connect();
+                SQL.Connect();
 
-                    int exists = Convert.ToInt32(SQL.ExecuteScalar(
-                        "SELECT COUNT(*) FROM dbo.t_Customers WHERE Customer_code = @code",
-                        new Dictionary<string, object> { { "@code", dlg.CustomerCode } }));
-                    if (exists > 0)
-                    {
-                        ShowWarning($"รหัสลูกค้า \"{dlg.CustomerCode}\" มีอยู่ในระบบแล้ว");
-                        return;
-                    }
-
-                    SQL.ExecuteCommand(@"
-                        INSERT INTO dbo.t_Customers
-                            (Customer_code, Full_name, Phone, Email, Address)
-                        VALUES (@code, @name, @phone, @email, @addr)",
-                        new Dictionary<string, object>
-                        {
-                            { "@code",  dlg.CustomerCode },
-                            { "@name",  dlg.FullName },
-                            { "@phone", dlg.Phone },
-                            { "@email", dlg.Email },
-                            { "@addr",  dlg.Address },
-                        });
-                }
-                catch (Exception ex)
+                int exists = Convert.ToInt32(SQL.ExecuteScalar(
+                    "SELECT COUNT(*) FROM dbo.t_Customers WHERE Customer_code = @code",
+                    new Dictionary<string, object> { { "@code", dlg.CustomerCode } }));
+                if (exists > 0)
                 {
-                    ShowError("เพิ่มไม่สำเร็จ:\n" + ex.Message);
+                    ShowWarning($"รหัสลูกค้า \"{dlg.CustomerCode}\" มีอยู่ในระบบแล้ว");
                     return;
                 }
-                finally
-                {
-                    SQL.Disconnect();
-                }
-                LoadData(txtSearch.Text);
+
+                SQL.ExecuteCommand(@"
+                    INSERT INTO dbo.t_Customers
+                        (Customer_code, Full_name, Phone, Email, Address)
+                    VALUES (@code, @name, @phone, @email, @addr)",
+                    new Dictionary<string, object>
+                    {
+                        { "@code",  dlg.CustomerCode },
+                        { "@name",  dlg.FullName },
+                        { "@phone", dlg.Phone },
+                        { "@email", dlg.Email },
+                        { "@addr",  dlg.Address },
+                    });
             }
+            catch (Exception ex)
+            {
+                ShowError("เพิ่มไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            finally
+            {
+                SQL.Disconnect();
+            }
+            LoadData(txtSearch.Text);
         }
 
         // ─── Edit ─────────────────────────────────────────────────────────────
@@ -125,47 +131,50 @@ namespace AppHub.CRUD
             var row = DGV.CurrentRow;
             int id  = Convert.ToInt32(row.Cells["Customer_id"].Value);
 
-            using (var dlg = new CustomerEditDialog("แก้ไข Customer"))
+            var dlg = new CustomerEditDialog("แก้ไข Customer")
             {
-                dlg.CustomerCode = row.Cells["Customer_code"].Value?.ToString();
-                dlg.FullName     = row.Cells["Full_name"].Value?.ToString();
-                dlg.Phone        = row.Cells["Phone"].Value?.ToString();
-                dlg.Email        = row.Cells["Email"].Value?.ToString();
-                dlg.Address      = row.Cells["Address"].Value?.ToString();
-                dlg.LockCode();
+                CustomerCode = row.Cells["Customer_code"].Value?.ToString(),
+                FullName     = row.Cells["Full_name"].Value?.ToString(),
+                Phone        = row.Cells["Phone"].Value?.ToString(),
+                Email        = row.Cells["Email"].Value?.ToString(),
+                Address      = row.Cells["Address"].Value?.ToString(),
+            };
+            dlg.LockCode();
+            ShowDialogChild(dlg, () => UpdateCustomer(id, dlg));
+        }
 
-                if (ShowModal(dlg) != DialogResult.OK) return;
-                try
-                {
-                    SQL.Connect();
-                    SQL.ExecuteCommand(@"
-                        UPDATE dbo.t_Customers
-                        SET    Full_name    = @name,
-                               Phone        = @phone,
-                               Email        = @email,
-                               Address      = @addr,
-                               Updated_date = GETDATE()
-                        WHERE  Customer_id  = @id",
-                        new Dictionary<string, object>
-                        {
-                            { "@name",  dlg.FullName },
-                            { "@phone", dlg.Phone },
-                            { "@email", dlg.Email },
-                            { "@addr",  dlg.Address },
-                            { "@id",    id },
-                        });
-                }
-                catch (Exception ex)
-                {
-                    ShowError("แก้ไขไม่สำเร็จ:\n" + ex.Message);
-                    return;
-                }
-                finally
-                {
-                    SQL.Disconnect();
-                }
-                LoadData(txtSearch.Text);
+        private void UpdateCustomer(int id, CustomerEditDialog dlg)
+        {
+            try
+            {
+                SQL.Connect();
+                SQL.ExecuteCommand(@"
+                    UPDATE dbo.t_Customers
+                    SET    Full_name    = @name,
+                           Phone        = @phone,
+                           Email        = @email,
+                           Address      = @addr,
+                           Updated_date = GETDATE()
+                    WHERE  Customer_id  = @id",
+                    new Dictionary<string, object>
+                    {
+                        { "@name",  dlg.FullName },
+                        { "@phone", dlg.Phone },
+                        { "@email", dlg.Email },
+                        { "@addr",  dlg.Address },
+                        { "@id",    id },
+                    });
             }
+            catch (Exception ex)
+            {
+                ShowError("แก้ไขไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            finally
+            {
+                SQL.Disconnect();
+            }
+            LoadData(txtSearch.Text);
         }
 
         // ─── Delete ───────────────────────────────────────────────────────────

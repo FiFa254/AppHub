@@ -30,18 +30,18 @@ namespace AppHub.Scan
             this.SuspendLayout();
 
             // lblTitle
+            this.lblTitle.Name      = "lblTitle";
             this.lblTitle.Dock      = System.Windows.Forms.DockStyle.Top;
             this.lblTitle.Font      = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(30, 60, 120);
             this.lblTitle.Height    = 40;
             this.lblTitle.Padding   = new System.Windows.Forms.Padding(8, 0, 0, 0);
-            this.lblTitle.Text      = "🔍 Scan / Input ข้อมูล";
+            this.lblTitle.Text      = "Scan / Input ข้อมูล";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 
             // pnlInput
             this.pnlInput.Dock      = System.Windows.Forms.DockStyle.Top;
             this.pnlInput.Height    = 110;
-            this.pnlInput.BackColor = System.Drawing.Color.FromArgb(245, 247, 252);
             this.pnlInput.Controls.AddRange(new System.Windows.Forms.Control[]
             {
                 this.lblCode, this.txtCode, this.lblNote, this.txtNote,
@@ -65,11 +65,10 @@ namespace AppHub.Scan
             this.txtNote.Size     = new System.Drawing.Size(400, 24);
             this.txtNote.Font     = new System.Drawing.Font("Segoe UI", 9F);
 
-            this.btnSave.Text      = "✅ บันทึก";
+            this.btnSave.Text      = "บันทึก";
             this.btnSave.Location  = new System.Drawing.Point(110, 74);
             this.btnSave.Size      = new System.Drawing.Size(90, 28);
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(200, 240, 200);
             this.btnSave.Font      = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnSave.Click    += new System.EventHandler(this.btnSave_Click);
 
@@ -97,7 +96,7 @@ namespace AppHub.Scan
             this.lblHistory.Font      = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.lblHistory.ForeColor = System.Drawing.Color.FromArgb(30, 60, 120);
 
-            this.btnRefresh.Text      = "🔄 Refresh";
+            this.btnRefresh.Text      = "รีเฟรช";
             this.btnRefresh.Location  = new System.Drawing.Point(750, 2);
             this.btnRefresh.Size      = new System.Drawing.Size(90, 24);
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

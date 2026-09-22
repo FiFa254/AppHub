@@ -16,6 +16,7 @@ namespace AppHub.Launcher
             this.btnAdd             = new System.Windows.Forms.Button();
             this.btnEditPermissions = new System.Windows.Forms.Button();
             this.btnToggleActive    = new System.Windows.Forms.Button();
+            this.btnResetPassword   = new System.Windows.Forms.Button();
             this.btnRefresh         = new System.Windows.Forms.Button();
             this.pnlToolbar.SuspendLayout();
             this.SuspendLayout();
@@ -23,33 +24,38 @@ namespace AppHub.Launcher
             // pnlToolbar
             this.pnlToolbar.Dock      = System.Windows.Forms.DockStyle.Top;
             this.pnlToolbar.Height    = 44;
-            this.pnlToolbar.BackColor = System.Drawing.Color.FromArgb(245, 247, 252);
             this.pnlToolbar.Controls.AddRange(new System.Windows.Forms.Control[]
             {
-                this.btnAdd, this.btnEditPermissions, this.btnToggleActive, this.btnRefresh
+                this.btnAdd, this.btnEditPermissions, this.btnToggleActive, this.btnResetPassword, this.btnRefresh
             });
 
-            this.btnAdd.Text      = "➕ เพิ่มผู้ใช้";
+            this.btnAdd.Text      = "เพิ่มผู้ใช้";
+            this.btnAdd.Tag       = "primary";
             this.btnAdd.Location  = new System.Drawing.Point(8, 8);
             this.btnAdd.Size      = new System.Drawing.Size(110, 28);
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAdd.BackColor = System.Drawing.Color.FromArgb(200, 240, 200);
             this.btnAdd.Click    += new System.EventHandler(this.btnAdd_Click);
 
-            this.btnEditPermissions.Text      = "🔑 กำหนดสิทธิ์";
+            this.btnEditPermissions.Text      = "กำหนดสิทธิ์";
             this.btnEditPermissions.Location  = new System.Drawing.Point(126, 8);
             this.btnEditPermissions.Size      = new System.Drawing.Size(120, 28);
             this.btnEditPermissions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEditPermissions.Click    += new System.EventHandler(this.btnEditPermissions_Click);
 
-            this.btnToggleActive.Text      = "⏻ เปิด/ปิดใช้งาน";
+            this.btnToggleActive.Text      = "เปิด/ปิดใช้งาน";
             this.btnToggleActive.Location  = new System.Drawing.Point(254, 8);
             this.btnToggleActive.Size      = new System.Drawing.Size(130, 28);
             this.btnToggleActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnToggleActive.Click    += new System.EventHandler(this.btnToggleActive_Click);
 
-            this.btnRefresh.Text      = "🔄 Refresh";
-            this.btnRefresh.Location  = new System.Drawing.Point(392, 8);
+            this.btnResetPassword.Text      = "รีเซ็ตรหัสผ่าน";
+            this.btnResetPassword.Location  = new System.Drawing.Point(392, 8);
+            this.btnResetPassword.Size      = new System.Drawing.Size(130, 28);
+            this.btnResetPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResetPassword.Click    += new System.EventHandler(this.btnResetPassword_Click);
+
+            this.btnRefresh.Text      = "รีเฟรช";
+            this.btnRefresh.Location  = new System.Drawing.Point(530, 8);
             this.btnRefresh.Size      = new System.Drawing.Size(90, 28);
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRefresh.Click    += new System.EventHandler(this.btnRefresh_Click);
@@ -73,6 +79,7 @@ namespace AppHub.Launcher
         private System.Windows.Forms.Button  btnAdd;
         private System.Windows.Forms.Button  btnEditPermissions;
         private System.Windows.Forms.Button  btnToggleActive;
+        private System.Windows.Forms.Button  btnResetPassword;
         private System.Windows.Forms.Button  btnRefresh;
     }
 }

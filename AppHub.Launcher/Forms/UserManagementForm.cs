@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Security.Cryptography;
-using System.Text;
 using System.Windows.Forms;
 using AppHub.Core;
 using AppHub.Core.UI;
@@ -17,7 +15,12 @@ namespace AppHub.Launcher
         public UserManagementForm()
         {
             InitializeComponent();
-            LblTitle.Text = "👤 จัดการผู้ใช้งาน";
+            LblTitle.Text = "จัดการผู้ใช้งาน";
+            Theme.SetIcon(btnAdd,             Theme.Icons.Add);
+            Theme.SetIcon(btnEditPermissions, Theme.Icons.Permission);
+            Theme.SetIcon(btnToggleActive,    Theme.Icons.Power);
+            Theme.SetIcon(btnResetPassword,   Theme.Icons.Key);
+            Theme.SetIcon(btnRefresh,         Theme.Icons.Refresh);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -34,7 +37,8 @@ namespace AppHub.Launcher
                 SQL.Connect();
 
                 var dt = SQL.ExecuteQuery(@"
-                    SELECT User_id, Username, Full_name, Is_admin, Is_active, Created_date
+                    SELECT User_id, Username, Full_name, Is_admin, Is_active,
+                           Last_login_date, Locked_until, Created_date
                     FROM   dbo.t_Users
                     ORDER  BY User_id", null);
 
@@ -74,48 +78,49 @@ namespace AppHub.Launcher
                 SQL.Disconnect();
             }
 
-            using (var dlg = new UserEditDialog(modules))
+            var dlg = new UserEditDialog(modules);
+            ShowDialogChild(dlg, () => AddUser(dlg));
+        }
+
+        private void AddUser(UserEditDialog dlg)
+        {
+            try
             {
-                if (ShowModal(dlg) != DialogResult.OK) return;
+                SQL.Connect();
 
-                try
+                int exists = Convert.ToInt32(SQL.ExecuteScalar(
+                    "SELECT COUNT(*) FROM dbo.t_Users WHERE Username = @u",
+                    new Dictionary<string, object> { { "@u", dlg.Username } }));
+                if (exists > 0)
                 {
-                    SQL.Connect();
-
-                    int exists = Convert.ToInt32(SQL.ExecuteScalar(
-                        "SELECT COUNT(*) FROM dbo.t_Users WHERE Username = @u",
-                        new Dictionary<string, object> { { "@u", dlg.Username } }));
-                    if (exists > 0)
-                    {
-                        ShowWarning($"Username \"{dlg.Username}\" มีอยู่ในระบบแล้ว");
-                        return;
-                    }
-
-                    int newId = Convert.ToInt32(SQL.ExecuteScalar(@"
-                        INSERT INTO dbo.t_Users (Username, Password_hash, Full_name, Is_admin, Is_active)
-                        VALUES (@u, @p, @f, @a, 1);
-                        SELECT SCOPE_IDENTITY();",
-                        new Dictionary<string, object>
-                        {
-                            { "@u", dlg.Username },
-                            { "@p", Sha256(dlg.Password) },
-                            { "@f", dlg.FullName },
-                            { "@a", dlg.IsAdmin },
-                        }));
-
-                    SavePermissions(newId, dlg.SelectedModules);
-                }
-                catch (Exception ex)
-                {
-                    ShowError("เพิ่มผู้ใช้ไม่สำเร็จ:\n" + ex.Message);
+                    ShowWarning($"Username \"{dlg.Username}\" มีอยู่ในระบบแล้ว");
                     return;
                 }
-                finally
-                {
-                    SQL.Disconnect();
-                }
-                LoadUsers();
+
+                int newId = Convert.ToInt32(SQL.ExecuteScalar(@"
+                    INSERT INTO dbo.t_Users (Username, Password_hash, Full_name, Is_admin, Is_active)
+                    VALUES (@u, @p, @f, @a, 1);
+                    SELECT SCOPE_IDENTITY();",
+                    new Dictionary<string, object>
+                    {
+                        { "@u", dlg.Username },
+                        { "@p", AccountRules.HashPassword(dlg.Password) },
+                        { "@f", dlg.FullName },
+                        { "@a", dlg.IsAdmin },
+                    }));
+
+                SavePermissions(newId, dlg.SelectedModules);
             }
+            catch (Exception ex)
+            {
+                ShowError("เพิ่มผู้ใช้ไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            finally
+            {
+                SQL.Disconnect();
+            }
+            LoadUsers();
         }
 
         // ─── Edit Permissions ─────────────────────────────────────────────────
@@ -152,28 +157,29 @@ namespace AppHub.Launcher
                 SQL.Disconnect();
             }
 
-            using (var dlg = new PermissionDialog(username, modules, current))
+            var dlg = new PermissionDialog(username, modules, current);
+            ShowDialogChild(dlg, () => UpdatePermissions(userId, dlg));
+        }
+
+        private void UpdatePermissions(int userId, PermissionDialog dlg)
+        {
+            try
             {
-                if (ShowModal(dlg) != DialogResult.OK) return;
-
-                try
-                {
-                    SQL.Connect();
-                    SavePermissions(userId, dlg.SelectedModules);
-                }
-                catch (Exception ex)
-                {
-                    ShowError("บันทึกสิทธิ์ไม่สำเร็จ:\n" + ex.Message);
-                    return;
-                }
-                finally
-                {
-                    SQL.Disconnect();
-                }
-
-                ShowInfo("บันทึกสิทธิ์สำเร็จ\n(มีผลเมื่อผู้ใช้ login ครั้งถัดไป)");
-                LoadUsers();
+                SQL.Connect();
+                SavePermissions(userId, dlg.SelectedModules);
             }
+            catch (Exception ex)
+            {
+                ShowError("บันทึกสิทธิ์ไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            finally
+            {
+                SQL.Disconnect();
+            }
+
+            ShowInfo("บันทึกสิทธิ์สำเร็จ\n(มีผลเมื่อผู้ใช้ login ครั้งถัดไป)");
+            LoadUsers();
         }
 
         private void DGV_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -223,6 +229,53 @@ namespace AppHub.Launcher
             LoadUsers();
         }
 
+        // ─── Reset Password (ปลดล็อกด้วย) ─────────────────────────────────────
+        private void btnResetPassword_Click(object sender, EventArgs e)
+        {
+            if (DGV.CurrentRow == null)
+            {
+                ShowWarning("กรุณาเลือกผู้ใช้");
+                return;
+            }
+
+            int    userId   = Convert.ToInt32(DGV.CurrentRow.Cells["User_id"].Value);
+            string username = DGV.CurrentRow.Cells["Username"].Value?.ToString();
+
+            var dlg = new ChangePasswordDialog(username, requireCurrent: false);
+            ShowDialogChild(dlg, () => ResetPassword(userId, username, dlg.NewPassword));
+        }
+
+        private void ResetPassword(int userId, string username, string newPassword)
+        {
+            try
+            {
+                SQL.Connect();
+                SQL.ExecuteCommand(@"
+                    UPDATE dbo.t_Users
+                    SET    Password_hash      = @p,
+                           Failed_login_count = 0,
+                           Locked_until       = NULL
+                    WHERE  User_id = @id",
+                    new Dictionary<string, object>
+                    {
+                        { "@p",  AccountRules.HashPassword(newPassword) },
+                        { "@id", userId },
+                    });
+            }
+            catch (Exception ex)
+            {
+                ShowError("รีเซ็ตรหัสผ่านไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            finally
+            {
+                SQL.Disconnect();
+            }
+
+            ShowInfo($"รีเซ็ตรหัสผ่านของ \"{username}\" สำเร็จ (ปลดล็อกบัญชีแล้ว)");
+            LoadUsers();
+        }
+
         // ─── Helpers ──────────────────────────────────────────────────────────
         /// <summary>ต้องเรียกขณะ SQL.Connect() ยัง active อยู่</summary>
         private static void SavePermissions(int userId, List<string> modules)
@@ -238,15 +291,5 @@ namespace AppHub.Launcher
             }
         }
 
-        private static string Sha256(string input)
-        {
-            using (var sha = SHA256.Create())
-            {
-                var sb = new StringBuilder();
-                foreach (byte b in sha.ComputeHash(Encoding.UTF8.GetBytes(input)))
-                    sb.Append(b.ToString("x2"));
-                return sb.ToString();
-            }
-        }
     }
 }

@@ -84,7 +84,7 @@
 | TC# | ชื่อ Test Case | Input | Expected Result | Priority |
 |---|---|---|---|---|
 | TC-U-01 | เปิดหน้า User Management | Login เป็น Admin | โหลดรายการ Users ทั้งหมดใน Grid | High |
-| TC-U-02 | เพิ่ม User ใหม่ | username: `user2`, pw: `test1234`, สิทธิ์: CRUD, IMPORT | User ปรากฏใน Grid | High |
+| TC-U-02 | เพิ่ม User ใหม่ | username: `user2`, pw: `Str0ng!Pass`, สิทธิ์: CRUD, IMPORT | User ปรากฏใน Grid | High |
 | TC-U-03 | เพิ่ม User ซ้ำ username | username ซ้ำกับที่มีอยู่ | DB error — แสดง MessageBox แจ้งเตือน | High |
 | TC-U-04 | เพิ่ม User โดยไม่กรอก Username | Username ว่าง | MessageBox "กรุณากรอก Username และ Password" | Medium |
 | TC-U-05 | กำหนดสิทธิ์ | เลือก user1 → กด "กำหนดสิทธิ์" → เพิ่ม SCAN | user1 login แล้วเห็นปุ่ม SCAN เพิ่ม | High |
@@ -148,6 +148,38 @@
 | TC-S-04 | กด Clear | กรอกข้อมูลแล้วกด Clear | ล้างทุก field กลับ empty | Low |
 | TC-S-05 | กด Enter บน field | กด Enter ใน txtCode หรือ txtNote | trigger บันทึก (AcceptButton) | Low |
 
+
+### 3.7 TC-REG — สมัครสมาชิก
+
+| TC# | ชื่อ Test Case | Input | Expected Result | Priority |
+|---|---|---|---|---|
+| TC-REG-01 | สมัครสำเร็จ | ชื่อ `สมศรี ทดสอบ`, user `somsri`, pw `Str0ng!Pass` | MessageBox "สมัครสมาชิกสำเร็จ", login ได้, ทุก module disabled + แจ้ง "ยังไม่ได้รับสิทธิ์" | High |
+| TC-REG-02 | Username ซ้ำ | user `user1` | MessageBox "มีผู้ใช้แล้ว" | High |
+| TC-REG-03 | รหัสผ่านไม่ผ่านเงื่อนไข | สั้นกว่า 8 / ไม่มีพิมพ์ใหญ่ / ไม่มีพิมพ์เล็ก / ไม่มีอักขระพิเศษ | MessageBox บอกข้อที่ขาด | High |
+| TC-REG-04 | ยืนยันรหัสไม่ตรง | confirm ต่างจาก password | MessageBox "ไม่ตรงกัน" | Medium |
+| TC-REG-05 | ชื่อ / Username ไม่ถูกต้อง | ชื่อว่าง, username < 3 ตัว / มีภาษาไทย / มีช่องว่าง | MessageBox แจ้งเตือน ไม่บันทึก | Medium |
+
+### 3.8 TC-PW / TC-LOCK / TC-CPW / TC-RPW — ความปลอดภัยบัญชี
+
+| TC# | ชื่อ Test Case | Input | Expected Result | Priority |
+|---|---|---|---|---|
+| TC-PW-01 | รหัสผ่านที่ถูกเงื่อนไข | `Str0ng!Pass`, `Abcdefg!` | ผ่าน | High |
+| TC-PW-02 | รหัสผ่านไม่ผ่าน | `abc`, `abcdefg!`, `Abcdefgh1` | บอกเงื่อนไขที่ขาดทุกข้อ | High |
+| TC-PW-03 | รูปแบบ Username | `john.doe_99` ผ่าน, `john doe` / `สมชาย` ไม่ผ่าน | ตามที่ระบุ | Medium |
+| TC-LOCK-01 | ใส่รหัสผิด | ผิด 2 ครั้ง | Failed_login_count = 2, ยังไม่ล็อก | High |
+| TC-LOCK-02 | ใส่รหัสผิดครบ 5 ครั้ง | ผิด 5 ครั้ง | "บัญชีถูกล็อกชั่วคราว", Locked_until = +15 นาที | High |
+| TC-LOCK-03 | ล็อกอยู่แต่ใส่รหัสถูก | รหัสถูกระหว่างล็อก | ยัง login ไม่ได้ | High |
+| TC-LOCK-04 | หมดเวลาล็อก | Locked_until ผ่านไปแล้ว | login ได้ / ใส่ผิดเริ่มนับ 1 ใหม่ | Medium |
+| TC-LOCK-05 | login สำเร็จ | รหัสถูก | ตัวนับ = 0, บันทึก Last_login_date | Medium |
+| TC-CPW-01 | เปลี่ยนรหัสผ่านสำเร็จ | ระบบ → เปลี่ยนรหัสผ่าน | รหัสใหม่ login ได้ รหัสเก่าไม่ได้ | High |
+| TC-CPW-02 | รหัสปัจจุบันผิด | current ผิด | MessageBox "รหัสผ่านปัจจุบันไม่ถูกต้อง" | High |
+| TC-CPW-03 | รหัสใหม่ไม่ผ่าน / ซ้ำเดิม / confirm ไม่ตรง | | MessageBox แจ้งเตือน ไม่บันทึก | Medium |
+| TC-RPW-01 | Admin รีเซ็ตรหัสผ่าน | เลือก user ที่ถูกล็อก → รีเซ็ต | รหัสใหม่ใช้ได้, ปลดล็อก | High |
+| TC-RPW-02 | Admin รีเซ็ตด้วยรหัสอ่อน | `short` | MessageBox แจ้งเงื่อนไข | Medium |
+| TC-RPW-03 | Admin เพิ่มผู้ใช้ด้วยรหัสอ่อน | `test1234` | MessageBox แจ้งเงื่อนไข | Medium |
+
+> ทุก TC ข้างบนมี automated test ใน `AppHub.Tests` (ดู `TestCategory`)
+
 ---
 
 ## 4. แผนการทดสอบ SIT / UAT
@@ -168,6 +200,8 @@
 | SIT-4 | TC-I-01 ถึง TC-I-07 | Import Excel flow |
 | SIT-5 | TC-R-01 ถึง TC-R-07 | Report + Export |
 | SIT-6 | TC-S-01 ถึง TC-S-05 | Scan / Input |
+| SIT-7 | TC-REG-01 ถึง TC-REG-05 | สมัครสมาชิก |
+| SIT-8 | TC-PW, TC-LOCK, TC-CPW, TC-RPW | ความปลอดภัยบัญชี |
 
 **เกณฑ์ผ่าน SIT:** Test case Priority High ผ่านทั้งหมด, Medium ≥ 80%
 
@@ -263,7 +297,9 @@ Expected: ทุกขั้นตอนทำงานถูกต้อง
 | SIT-4 (Import) | 7 | | | | |
 | SIT-5 (Report) | 7 | | | | |
 | SIT-6 (Scan) | 5 | | | | |
-| **รวม** | **43** | | | | |
+| SIT-7 (Register) | 5 | | | | |
+| SIT-8 (Account Security) | 14 | | | | |
+| **รวม** | **62** | | | | |
 
 ---
 

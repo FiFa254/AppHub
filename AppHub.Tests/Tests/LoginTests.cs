@@ -23,8 +23,18 @@ namespace AppHub.Tests
 
         private MainForm OpenMain() => Track(new MainForm());
 
-        private static bool Enabled(MainForm main, string item) => Ui.Get<ToolStripItem>(main, item).Enabled;
-        private static bool Available(MainForm main, string item) => Ui.Get<ToolStripItem>(main, item).Available;
+        private static bool Enabled(MainForm main, string item)
+        {
+            object target = Ui.Get<object>(main, item);
+            return target is ToolStripItem menu ? menu.Enabled : ((Control)target).Enabled;
+        }
+
+        /// <summary>ตั้งให้แสดงไหม (ไม่ขึ้นกับว่า form แสดงบนจออยู่หรือเปล่า)</summary>
+        private static bool Available(MainForm main, string item)
+        {
+            object target = Ui.Get<object>(main, item);
+            return target is ToolStripItem menu ? menu.Available : Ui.IsSetVisible((Control)target);
+        }
 
         [TestMethod, TestCategory("TC-L-01")]
         public void Admin_Login_SeesAllModulesAndUserManagement()
@@ -37,10 +47,10 @@ namespace AppHub.Tests
 
             var main = OpenMain();
             foreach (var item in new[] { "mnuCRUD", "mnuImport", "mnuReport", "mnuScan",
-                                         "tsbCRUD", "tsbImport", "tsbReport", "tsbScan" })
+                                         "navCRUD", "navImport", "navReport", "navScan" })
                 Assert.IsTrue(Enabled(main, item), item);
             Assert.IsTrue(Available(main, "mnuUserManagement"));
-            Assert.IsTrue(Available(main, "tsbUserManagement"));
+            Assert.IsTrue(Available(main, "navUsers"));
         }
 
         [TestMethod, TestCategory("TC-L-02")]
@@ -55,8 +65,8 @@ namespace AppHub.Tests
             Assert.IsTrue(Enabled(main, "mnuReport"));
             Assert.IsFalse(Enabled(main, "mnuImport"));
             Assert.IsFalse(Enabled(main, "mnuScan"));
-            Assert.IsFalse(Enabled(main, "tsbImport"));
-            Assert.IsFalse(Enabled(main, "tsbScan"));
+            Assert.IsFalse(Enabled(main, "navImport"));
+            Assert.IsFalse(Enabled(main, "navScan"));
         }
 
         [TestMethod, TestCategory("TC-L-03")]
@@ -133,7 +143,7 @@ namespace AppHub.Tests
             var main = OpenMain();
 
             Assert.IsFalse(Available(main, "mnuUserManagement"));
-            Assert.IsFalse(Available(main, "tsbUserManagement"));
+            Assert.IsFalse(Available(main, "navUsers"));
         }
 
         [TestMethod]

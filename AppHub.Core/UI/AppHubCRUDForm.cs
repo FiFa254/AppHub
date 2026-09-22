@@ -5,7 +5,7 @@ namespace AppHub.Core.UI
 {
     /// <summary>
     /// Base form สำหรับ form ที่มี grid หลัก
-    /// มี LblTitle (บน), DGV (กลาง), PnlFooter + LblCount (ล่าง) พร้อมใช้
+    /// มี LblTitle (บน), DGV ในการ์ดสีขาว (กลาง), PnlFooter + LblCount (ล่าง) พร้อมใช้
     /// form ลูกเพิ่มได้แค่ toolbar/filter panel (Dock = Top) — ห้ามสร้าง grid/title ซ้ำ
     /// </summary>
     public class AppHubCRUDForm : AppHubForm
@@ -14,6 +14,8 @@ namespace AppHub.Core.UI
         protected Label         LblTitle;
         protected Label         LblCount;
         protected Panel         PnlFooter;
+
+        private Panel _gridHost;
 
         public AppHubCRUDForm()
         {
@@ -24,17 +26,15 @@ namespace AppHub.Core.UI
         {
             LblTitle = new Label
             {
+                Name      = "LblTitle",
                 Dock      = DockStyle.Top,
-                Font      = new System.Drawing.Font("Segoe UI", 12F,
-                                System.Drawing.FontStyle.Bold),
-                ForeColor = System.Drawing.Color.FromArgb(30, 60, 120),
-                Height    = 40,
-                Padding   = new Padding(8, 0, 0, 0),
+                Height    = 52,
                 TextAlign = System.Drawing.ContentAlignment.MiddleLeft
             };
 
             DGV = new DataGridView
             {
+                Name                  = "DGV",
                 Dock                  = DockStyle.Fill,
                 AllowUserToAddRows    = false,
                 AllowUserToDeleteRows = false,
@@ -45,34 +45,48 @@ namespace AppHub.Core.UI
                 RowHeadersVisible     = false
             };
 
+            // การ์ดสีขาวรอบ grid — เว้นขอบให้เห็นพื้นหลัง
+            _gridHost = new Panel
+            {
+                Name      = "GridHost",
+                Tag       = "card",
+                Dock      = DockStyle.Fill,
+                Padding   = new Padding(16, 12, 16, 0),
+                BackColor = Theme.Background
+            };
+            _gridHost.Controls.Add(DGV);
+
             LblCount = new Label
             {
                 AutoSize  = true,
-                Location  = new System.Drawing.Point(8, 10),
-                Font      = new System.Drawing.Font("Segoe UI", 9F),
-                ForeColor = System.Drawing.Color.Gray
+                Location  = new System.Drawing.Point(18, 11),
+                Font      = Theme.Body,
+                ForeColor = Theme.TextMuted
             };
 
             // ปุ่มที่ form ลูกเพิ่มใน footer ให้ใช้ Dock = Right
             PnlFooter = new Panel
             {
-                Dock    = DockStyle.Bottom,
-                Height  = 36,
-                Padding = new Padding(0, 4, 8, 4)
+                Name      = "PnlFooter",
+                Tag       = "footer",
+                Dock      = DockStyle.Bottom,
+                Height    = 44,
+                Padding   = new Padding(0, 6, 16, 6),
+                BackColor = Theme.Background
             };
             PnlFooter.Controls.Add(LblCount);
 
-            this.Controls.Add(DGV);
+            this.Controls.Add(_gridHost);
             this.Controls.Add(PnlFooter);
             this.Controls.Add(LblTitle);
-            this.ClientSize = new System.Drawing.Size(860, 540);
+            this.ClientSize = new System.Drawing.Size(900, 560);
         }
 
         protected override void OnLoad(EventArgs e)
         {
-            // จัดลำดับ dock: title บนสุด → panel ของ form ลูก → grid เต็มพื้นที่ที่เหลือ
+            // จัดลำดับ dock: title บนสุด → panel ของ form ลูก → การ์ด grid เต็มพื้นที่ที่เหลือ
             LblTitle.SendToBack();
-            DGV.BringToFront();
+            _gridHost.BringToFront();
             base.OnLoad(e);
         }
 

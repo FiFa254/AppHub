@@ -14,6 +14,8 @@ namespace AppHub.Tests
     [TestClass]
     public class UserManagementTests : UiTestBase
     {
+        private const string StrongPassword = "Str0ng!Pass";
+
         [TestInitialize]
         public void SignIn() => SignInAs("admin");
 
@@ -58,13 +60,13 @@ namespace AppHub.Tests
         public void AddUser_WithModules_AppearsInGridAndDb()
         {
             var form = Open<UserManagementForm>();
-            DialogHandlers.Enqueue(d => FillUserDialog(d, "user2", "test1234", "User Two", "CRUD", "IMPORT"));
+            DialogHandlers.Enqueue(d => FillUserDialog(d, "user2", StrongPassword, "User Two", "CRUD", "IMPORT"));
 
             Ui.Click(form, "btnAdd_Click");
 
             AssertNoError();
             Assert.AreEqual(3, GridRowCount(form));
-            Assert.AreEqual(TestDb.Sha256("test1234"),
+            Assert.AreEqual(TestDb.Sha256(StrongPassword),
                 TestDb.Scalar("SELECT Password_hash FROM dbo.t_Users WHERE Username = 'user2'"));
             CollectionAssert.AreEqual(new[] { "CRUD", "IMPORT" }, ModulesOf("user2"));
         }
@@ -73,7 +75,7 @@ namespace AppHub.Tests
         public void AddUser_DuplicateUsername_ShowsWarning()
         {
             var form = Open<UserManagementForm>();
-            DialogHandlers.Enqueue(d => FillUserDialog(d, "user1", "x1234", "Dup"));
+            DialogHandlers.Enqueue(d => FillUserDialog(d, "user1", StrongPassword, "Dup"));
 
             Ui.Click(form, "btnAdd_Click");
 
@@ -100,8 +102,8 @@ namespace AppHub.Tests
             DialogHandlers.Enqueue(d =>
             {
                 Ui.Get<TextBox>(d, "txtUsername").Text = "user3";
-                Ui.Get<TextBox>(d, "txtPassword").Text = "aaaa";
-                Ui.Get<TextBox>(d, "txtConfirm").Text  = "bbbb";
+                Ui.Get<TextBox>(d, "txtPassword").Text = StrongPassword;
+                Ui.Get<TextBox>(d, "txtConfirm").Text  = StrongPassword + "x";
                 Ui.Click(d, "BtnOk_Click");
                 return d.DialogResult;
             });

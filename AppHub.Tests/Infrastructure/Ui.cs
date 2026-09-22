@@ -49,6 +49,15 @@ namespace AppHub.Tests.Infrastructure
         public static void Click(object form, string handlerName)
             => Call(form, handlerName, form, EventArgs.Empty);
 
+        /// <summary>
+        /// ค่า Visible ที่โค้ดตั้งไว้ — Control.Visible คืน false ตลอดถ้า form ยังไม่แสดงบนจอ
+        /// </summary>
+        public static bool IsSetVisible(Control control)
+        {
+            const int STATE_VISIBLE = 0x00000002;
+            return (bool)Call(control, "GetState", STATE_VISIBLE);
+        }
+
         /// <summary>เลือกแถวใน grid ที่ column มีค่าตรงกับ value</summary>
         public static void SelectRow(DataGridView grid, string column, string value)
         {

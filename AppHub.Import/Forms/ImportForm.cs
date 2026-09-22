@@ -20,6 +20,9 @@ namespace AppHub.Import
         {
             InitializeComponent();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            Theme.SetIcon(btnBrowse, Theme.Icons.OpenFile);
+            Theme.SetIcon(btnImport, Theme.Icons.Import);
+            dgvPreview.CellFormatting += dgvPreview_CellFormatting;
         }
 
         // ─── Browse ───────────────────────────────────────────────────────────
@@ -113,6 +116,17 @@ namespace AppHub.Import
             return dt;
         }
 
+        /// <summary>สีสถานะ: นำเข้าแล้ว = เขียว, ซ้ำ = ส้ม, ข้อมูลไม่ครบ = แดง</summary>
+        private void dgvPreview_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvPreview.Columns[e.ColumnIndex].Name != "สถานะ") return;
+            string status = Convert.ToString(e.Value);
+            if (status.StartsWith("นำเข้าแล้ว"))    e.CellStyle.ForeColor = Theme.Success;
+            else if (status.StartsWith("ซ้ำ"))      e.CellStyle.ForeColor = System.Drawing.Color.FromArgb(217, 119, 6);
+            else if (status.StartsWith("ไม่มีชื่อ")) e.CellStyle.ForeColor = Theme.Danger;
+            else                                     e.CellStyle.ForeColor = Theme.TextMuted;
+        }
+
         // ─── Import ───────────────────────────────────────────────────────────
         private void btnImport_Click(object sender, EventArgs e)
         {
@@ -134,13 +148,13 @@ namespace AppHub.Import
                     string code = row["Customer_code"].ToString();
                     if (existing.Contains(code))
                     {
-                        row["สถานะ"] = "⚠️ ซ้ำ — ข้าม";
+                        row["สถานะ"] = "ซ้ำ — ข้าม";
                         skipped++;
                         continue;
                     }
                     if (string.IsNullOrWhiteSpace(row["Full_name"].ToString()))
                     {
-                        row["สถานะ"] = "❌ ไม่มีชื่อ — ข้าม";
+                        row["สถานะ"] = "ไม่มีชื่อ — ข้าม";
                         invalid++;
                         continue;
                     }
@@ -159,7 +173,7 @@ namespace AppHub.Import
                         });
 
                     existing.Add(code);
-                    row["สถานะ"] = "✅ นำเข้าแล้ว";
+                    row["สถานะ"] = "นำเข้าแล้ว";
                     inserted++;
                 }
             }

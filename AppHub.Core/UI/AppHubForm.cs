@@ -16,6 +16,12 @@ namespace AppHub.Core.UI
             this.StartPosition   = FormStartPosition.CenterParent;
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            Theme.ApplyForm(this);
+            base.OnLoad(e);
+        }
+
         /// <summary>
         /// แสดง error message มาตรฐาน
         /// </summary>
@@ -45,10 +51,61 @@ namespace AppHub.Core.UI
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
 
         /// <summary>
-        /// เปิด dialog แบบ modal (ใช้แทน dialog.ShowDialog(this))
+        /// เปิด dialog แบบ modal — ใช้เฉพาะ form ที่ไม่อยู่ใน MainForm (เช่นหน้า Login)
+        /// form ใน MainForm ให้ใช้ ShowDialogChild
         /// </summary>
         protected DialogResult ShowModal(Form dialog)
             => UiServices.ShowDialog(dialog, this);
+
+        /// <summary>
+        /// dialog ที่เปิดค้างจาก form นี้ (form ถูกล็อกระหว่างนั้น) — MainForm ใช้ยก dialog ขึ้นมาเมื่อกลับมาที่หน้านี้
+        /// </summary>
+        public Form OpenDialog { get; private set; }
+
+        /// <summary>
+        /// ยก form นี้ขึ้นมาใน MainForm — ถ้ามี dialog ค้างอยู่ให้ dialog อยู่ข้างหน้า
+        /// </summary>
+        public void BringUp()
+        {
+            if (WindowState == FormWindowState.Minimized)
+                WindowState = FormWindowState.Normal;
+
+            if (OpenDialog != null && !OpenDialog.IsDisposed)
+            {
+                BringToFront();              // form ที่ถูกล็อก activate ไม่ได้ → ยกด้วย z-order
+                OpenDialog.Activate();
+            }
+            else
+            {
+                Activate();
+            }
+        }
+
+        /// <summary>
+        /// เปิด dialog เป็นหน้าต่างลูกใน MainForm (MDI) — onOk ทำงานหลังกด OK แล้ว dialog ปิด
+        /// ระหว่างเปิด form นี้ถูก disable กันกดซ้ำ; ถ้าไม่มี MDI container จะเปิดแบบ modal แทน
+        /// </summary>
+        protected void ShowDialogChild(Form dialog, Action onOk)
+        {
+            Form container = IsMdiContainer ? this : MdiParent;
+            bool lockOwner = !IsMdiContainer;
+            if (lockOwner)
+            {
+                Enabled    = false;
+                OpenDialog = dialog;
+            }
+
+            UiServices.ShowChild(dialog, container, result =>
+            {
+                if (OpenDialog == dialog) OpenDialog = null;
+                if (lockOwner && !IsDisposed)
+                {
+                    Enabled = true;
+                    Activate();
+                }
+                if (result == DialogResult.OK) onOk();
+            });
+        }
 
         /// <summary>
         /// เลือกไฟล์ที่จะเปิด → path หรือ null ถ้ายกเลิก

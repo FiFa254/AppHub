@@ -107,8 +107,14 @@ Data Source=.\SQLEXPRESS;Initial Catalog=AppHubDB;Integrated Security=True
 
 ## Architecture Notes
 
-- **MDI Pattern:** `MainForm` เป็น MDI container, แต่ละโมดูลเปิดเป็น MDI child
+- **MDI Pattern:** `MainForm` เป็น MDI container มีเมนู sidebar ด้านซ้าย — แต่ละโมดูลเปิดเป็น MDI child เต็มพื้นที่ทำงาน, dialog ก็เปิดอยู่ใน MainForm
+- **Design system:** สี / ฟอนต์ / ไอคอน / สไตล์ปุ่มและตารางอยู่ที่ `AppHub.Core\UI\Theme.cs` ที่เดียว
+- **โครงสร้างโฟลเดอร์ (Folder-by-Type):** ทุก project แยก `Forms\`, `Dialogs\`, `Controls\` — Core แยก `Data\`, `Security\`, `UI\`
 - **Session:** `AppSession` (static class) เก็บ user/permissions ใช้ร่วมกันทุก project
 - **Connection String:** module projects ใช้ `ConfigurationManager` ดึงจาก `AppHub.Launcher\App.config` โดยอัตโนมัติ
 - **Permission:** Admin เห็นทุกโมดูล, User เห็นเฉพาะที่ได้รับสิทธิ์
 - **Password:** SHA-256 hash, ไม่เก็บ plain text
+- **สมัครสมาชิก:** ลิงก์ "ยังไม่มีบัญชี? สมัครสมาชิก" ในหน้า Login — สมัครแล้ว login ได้ทันที แต่ต้องรอ Admin กำหนดสิทธิ์ module
+- **Password policy:** อย่างน้อย 8 ตัว, มีตัวพิมพ์เล็ก a-z, พิมพ์ใหญ่ A-Z และอักขระพิเศษ (ใช้กับสมัคร / Admin เพิ่มผู้ใช้ / รีเซ็ต / เปลี่ยนรหัส)
+- **ล็อกบัญชี:** ใส่รหัสผิด 5 ครั้ง ล็อก 15 นาที — Admin ปลดล็อกได้ด้วย "รีเซ็ตรหัสผ่าน"
+- **เปลี่ยนรหัสผ่าน:** เมนู ระบบ → เปลี่ยนรหัสผ่าน
