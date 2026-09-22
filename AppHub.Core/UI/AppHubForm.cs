@@ -20,29 +20,47 @@ namespace AppHub.Core.UI
         /// แสดง error message มาตรฐาน
         /// </summary>
         protected void ShowError(string message, string title = "Error")
-            => MessageBox.Show(this, message, title,
+            => UiServices.ShowMessage(this, message, title,
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
 
         /// <summary>
         /// แสดง warning message
         /// </summary>
         protected void ShowWarning(string message, string title = "แจ้งเตือน")
-            => MessageBox.Show(this, message, title,
+            => UiServices.ShowMessage(this, message, title,
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
         /// <summary>
         /// แสดงข้อความแจ้งผลสำเร็จ
         /// </summary>
         protected void ShowInfo(string message, string title = "สำเร็จ")
-            => MessageBox.Show(this, message, title,
+            => UiServices.ShowMessage(this, message, title,
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         /// <summary>
         /// ถามยืนยัน Yes/No
         /// </summary>
         protected bool Confirm(string message, string title = "ยืนยัน")
-            => MessageBox.Show(this, message, title,
+            => UiServices.ShowMessage(this, message, title,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+
+        /// <summary>
+        /// เปิด dialog แบบ modal (ใช้แทน dialog.ShowDialog(this))
+        /// </summary>
+        protected DialogResult ShowModal(Form dialog)
+            => UiServices.ShowDialog(dialog, this);
+
+        /// <summary>
+        /// เลือกไฟล์ที่จะเปิด → path หรือ null ถ้ายกเลิก
+        /// </summary>
+        protected string PickOpenFile(string filter, string title)
+            => UiServices.PickOpenFile(this, filter, title);
+
+        /// <summary>
+        /// เลือกที่บันทึกไฟล์ → path หรือ null ถ้ายกเลิก
+        /// </summary>
+        protected string PickSaveFile(string filter, string fileName)
+            => UiServices.PickSaveFile(this, filter, fileName);
 
         // ─── Placeholder (.NET Framework ไม่มี TextBox.PlaceholderText) ────────
         private const int EM_SETCUEBANNER = 0x1501;

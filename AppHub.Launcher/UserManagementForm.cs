@@ -58,9 +58,25 @@ namespace AppHub.Launcher
         // ─── Add User ─────────────────────────────────────────────────────────
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            using (var dlg = new UserEditDialog())
+            List<KeyValuePair<string, string>> modules;
+            try
             {
-                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                SQL.Connect();
+                modules = ModuleCatalog.Load();
+            }
+            catch (Exception ex)
+            {
+                ShowError("โหลดรายการ module ไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            finally
+            {
+                SQL.Disconnect();
+            }
+
+            using (var dlg = new UserEditDialog(modules))
+            {
+                if (ShowModal(dlg) != DialogResult.OK) return;
 
                 try
                 {
@@ -115,9 +131,11 @@ namespace AppHub.Launcher
             string username = DGV.CurrentRow.Cells["Username"].Value?.ToString();
 
             var current = new List<string>();
+            List<KeyValuePair<string, string>> modules;
             try
             {
                 SQL.Connect();
+                modules = ModuleCatalog.Load();
                 var dt = SQL.ExecuteQuery(
                     "SELECT Module_code FROM dbo.t_UserModule WHERE User_id = @uid",
                     new Dictionary<string, object> { { "@uid", userId } });
@@ -134,9 +152,9 @@ namespace AppHub.Launcher
                 SQL.Disconnect();
             }
 
-            using (var dlg = new PermissionDialog(username, current))
+            using (var dlg = new PermissionDialog(username, modules, current))
             {
-                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                if (ShowModal(dlg) != DialogResult.OK) return;
 
                 try
                 {

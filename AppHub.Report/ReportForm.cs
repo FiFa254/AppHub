@@ -113,41 +113,37 @@ namespace AppHub.Report
                 return;
             }
 
-            using (var dlg = new SaveFileDialog
+            string path = PickSaveFile("CSV Files|*.csv",
+                                       $"Customer_Report_{DateTime.Today:yyyyMMdd}.csv");
+            if (path == null) return;
+
+            try
             {
-                Filter   = "CSV Files|*.csv",
-                FileName = $"Customer_Report_{DateTime.Today:yyyyMMdd}.csv"
-            })
-            {
-                if (dlg.ShowDialog(this) != DialogResult.OK) return;
-                try
+                var sb = new StringBuilder();
+                for (int c = 0; c < dt.Columns.Count; c++)
                 {
-                    var sb = new StringBuilder();
+                    if (c > 0) sb.Append(',');
+                    sb.Append('"').Append(dt.Columns[c].ColumnName).Append('"');
+                }
+                sb.AppendLine();
+                foreach (DataRow row in dt.Rows)
+                {
                     for (int c = 0; c < dt.Columns.Count; c++)
                     {
                         if (c > 0) sb.Append(',');
-                        sb.Append('"').Append(dt.Columns[c].ColumnName).Append('"');
+                        sb.Append('"').Append(FormatCell(row[c]).Replace("\"", "\"\"")).Append('"');
                     }
                     sb.AppendLine();
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        for (int c = 0; c < dt.Columns.Count; c++)
-                        {
-                            if (c > 0) sb.Append(',');
-                            sb.Append('"').Append(FormatCell(row[c]).Replace("\"", "\"\"")).Append('"');
-                        }
-                        sb.AppendLine();
-                    }
-                    // UTF-8 มี BOM เพื่อให้ Excel อ่านภาษาไทยถูก
-                    File.WriteAllText(dlg.FileName, sb.ToString(), new UTF8Encoding(true));
                 }
-                catch (Exception ex)
-                {
-                    ShowError("Export ไม่สำเร็จ:\n" + ex.Message);
-                    return;
-                }
-                ShowInfo($"Export สำเร็จ:\n{dlg.FileName}");
+                // UTF-8 มี BOM เพื่อให้ Excel อ่านภาษาไทยถูก
+                File.WriteAllText(path, sb.ToString(), new UTF8Encoding(true));
             }
+            catch (Exception ex)
+            {
+                ShowError("Export ไม่สำเร็จ:\n" + ex.Message);
+                return;
+            }
+            ShowInfo($"Export สำเร็จ:\n{path}");
         }
 
         private static string FormatCell(object value)

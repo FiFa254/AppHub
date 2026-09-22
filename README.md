@@ -13,7 +13,8 @@ AppHub.sln
 ├── AppHub.CRUD         ← จัดการข้อมูลลูกค้า (CRUD)
 ├── AppHub.Import       ← นำเข้าข้อมูลจาก Excel
 ├── AppHub.Report       ← รายงานและ Export CSV
-└── AppHub.Scan         ← Scan / Input รหัสลูกค้า
+├── AppHub.Scan         ← Scan / Input รหัสลูกค้า
+└── AppHub.Tests        ← Automated tests (MSTest) ตาม AppHub_TestPlan.md
 ```
 
 ---
@@ -45,6 +46,12 @@ setup.sql
 ### 5. Build & Run
 
 กด **F5** หรือ **Ctrl+F5**
+
+### 6. Run Tests
+
+Visual Studio: **Test → Run All Tests**
+
+Test ใช้ database แยก `AppHubDB_Test` (สร้างใหม่จาก `setup.sql` ทุกครั้ง) จึงไม่กระทบข้อมูลใน `AppHubDB`
 
 ---
 

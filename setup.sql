@@ -26,6 +26,29 @@ BEGIN
 END
 GO
 
+/* ─── Modules (รายการ module ทั้งหมดในระบบ) ────────────────────────────────── */
+IF OBJECT_ID(N'dbo.t_Modules', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.t_Modules
+    (
+        Module_code  VARCHAR(20)    NOT NULL CONSTRAINT PK_t_Modules PRIMARY KEY,
+        Module_name  NVARCHAR(100)  NOT NULL,
+        Sort_order   INT            NOT NULL CONSTRAINT DF_t_Modules_Sort DEFAULT (0)
+    );
+END
+GO
+
+INSERT INTO dbo.t_Modules (Module_code, Module_name, Sort_order)
+SELECT s.Module_code, s.Module_name, s.Sort_order
+FROM (VALUES
+    ('CRUD',   N'จัดการลูกค้า',  1),
+    ('IMPORT', N'นำเข้า Excel',  2),
+    ('REPORT', N'รายงาน',        3),
+    ('SCAN',   N'Scan บัตร',     4)
+) s(Module_code, Module_name, Sort_order)
+WHERE NOT EXISTS (SELECT 1 FROM dbo.t_Modules m WHERE m.Module_code = s.Module_code);
+GO
+
 /* ─── User ↔ Module permission ─────────────────────────────────────────────── */
 IF OBJECT_ID(N'dbo.t_UserModule', N'U') IS NULL
 BEGIN
@@ -33,10 +56,18 @@ BEGIN
     (
         User_id      INT          NOT NULL
             CONSTRAINT FK_t_UserModule_User REFERENCES dbo.t_Users (User_id) ON DELETE CASCADE,
-        Module_code  VARCHAR(20)  NOT NULL,          -- CRUD / IMPORT / REPORT / SCAN
+        Module_code  VARCHAR(20)  NOT NULL
+            CONSTRAINT FK_t_UserModule_Module REFERENCES dbo.t_Modules (Module_code),
         CONSTRAINT PK_t_UserModule PRIMARY KEY (User_id, Module_code)
     );
 END
+GO
+
+-- DB ที่สร้างก่อนมี t_Modules → เพิ่ม FK ให้
+IF OBJECT_ID(N'dbo.FK_t_UserModule_Module', N'F') IS NULL
+    ALTER TABLE dbo.t_UserModule
+        ADD CONSTRAINT FK_t_UserModule_Module
+        FOREIGN KEY (Module_code) REFERENCES dbo.t_Modules (Module_code);
 GO
 
 /* ─── Customers ────────────────────────────────────────────────────────────── */
@@ -90,7 +121,7 @@ GO
 INSERT INTO dbo.t_UserModule (User_id, Module_code)
 SELECT u.User_id, m.Module_code
 FROM   dbo.t_Users u
-CROSS  JOIN (VALUES ('CRUD'), ('IMPORT'), ('REPORT'), ('SCAN')) m(Module_code)
+CROSS  JOIN dbo.t_Modules m
 WHERE  u.Username = N'admin'
   AND  NOT EXISTS (SELECT 1 FROM dbo.t_UserModule x
                    WHERE x.User_id = u.User_id AND x.Module_code = m.Module_code);

@@ -1,31 +1,47 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Windows.Forms;
+using AppHub.Core;
 using AppHub.Core.UI;
 
 namespace AppHub.Launcher
 {
     /// <summary>
-    /// รายการ module ทั้งหมดที่กำหนดสิทธิ์ได้ (ใช้ร่วมกับ UserEditDialog)
+    /// รายการ module จาก dbo.t_Modules (ใช้ร่วมกับ UserEditDialog / PermissionDialog)
     /// </summary>
     internal static class ModuleCatalog
     {
-        public static readonly KeyValuePair<string, string>[] All =
+        public const int RowHeight = 26;
+
+        /// <summary>
+        /// โหลด module ทั้งหมด (Key = Module_code, Value = ข้อความที่แสดง)
+        /// ต้องเรียกขณะ SQL.Connect() ยัง active อยู่
+        /// </summary>
+        public static List<KeyValuePair<string, string>> Load()
         {
-            new KeyValuePair<string, string>("CRUD",   "จัดการลูกค้า (CRUD)"),
-            new KeyValuePair<string, string>("IMPORT", "นำเข้า Excel (IMPORT)"),
-            new KeyValuePair<string, string>("REPORT", "รายงาน (REPORT)"),
-            new KeyValuePair<string, string>("SCAN",   "Scan บัตร (SCAN)"),
-        };
+            var dt = SQL.ExecuteQuery(@"
+                SELECT Module_code, Module_name
+                FROM   dbo.t_Modules
+                ORDER  BY Sort_order, Module_code", null);
+
+            var modules = new List<KeyValuePair<string, string>>();
+            foreach (DataRow r in dt.Rows)
+            {
+                string code = r["Module_code"].ToString();
+                modules.Add(new KeyValuePair<string, string>(code, $"{r["Module_name"]} ({code})"));
+            }
+            return modules;
+        }
 
         /// <summary>
         /// สร้าง checkbox ของทุก module เรียงลงมาจากตำแหน่ง (x, y)
         /// </summary>
         public static List<CheckBox> CreateCheckBoxes(Control parent, int x, int y,
-            ICollection<string> checkedCodes)
+            IEnumerable<KeyValuePair<string, string>> modules, ICollection<string> checkedCodes)
         {
             var boxes = new List<CheckBox>();
-            foreach (var m in All)
+            foreach (var m in modules)
             {
                 var chk = new CheckBox
                 {
@@ -37,7 +53,7 @@ namespace AppHub.Launcher
                 };
                 parent.Controls.Add(chk);
                 boxes.Add(chk);
-                y += 26;
+                y += RowHeight;
             }
             return boxes;
         }
@@ -61,17 +77,21 @@ namespace AppHub.Launcher
 
         public List<string> SelectedModules => ModuleCatalog.GetChecked(_chkModules);
 
-        public PermissionDialog(string username, List<string> currentModules)
+        public PermissionDialog(string username,
+            List<KeyValuePair<string, string>> modules, List<string> currentModules)
         {
-            BuildUI(username, currentModules);
+            BuildUI(username, modules, currentModules);
         }
 
-        private void BuildUI(string username, List<string> currentModules)
+        private void BuildUI(string username,
+            List<KeyValuePair<string, string>> modules, List<string> currentModules)
         {
+            int buttonY = 40 + modules.Count * ModuleCatalog.RowHeight + 12;
+
             this.Text            = "กำหนดสิทธิ์ — " + username;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition   = FormStartPosition.CenterParent;
-            this.ClientSize      = new System.Drawing.Size(300, 200);
+            this.ClientSize      = new System.Drawing.Size(300, buttonY + 44);
             this.MaximizeBox     = false;
             this.MinimizeBox     = false;
 
@@ -83,12 +103,12 @@ namespace AppHub.Launcher
             };
             this.Controls.Add(lblHeader);
 
-            _chkModules = ModuleCatalog.CreateCheckBoxes(this, 24, 40, currentModules);
+            _chkModules = ModuleCatalog.CreateCheckBoxes(this, 24, 40, modules, currentModules);
 
             btnOk = new Button
             {
                 Text         = "บันทึก",
-                Location     = new System.Drawing.Point(110, 156),
+                Location     = new System.Drawing.Point(110, buttonY),
                 Size         = new System.Drawing.Size(80, 28),
                 FlatStyle    = FlatStyle.Flat,
                 BackColor    = System.Drawing.Color.FromArgb(220, 235, 255),
@@ -98,7 +118,7 @@ namespace AppHub.Launcher
             btnCancel = new Button
             {
                 Text         = "ยกเลิก",
-                Location     = new System.Drawing.Point(198, 156),
+                Location     = new System.Drawing.Point(198, buttonY),
                 Size         = new System.Drawing.Size(80, 28),
                 FlatStyle    = FlatStyle.Flat,
                 DialogResult = DialogResult.Cancel

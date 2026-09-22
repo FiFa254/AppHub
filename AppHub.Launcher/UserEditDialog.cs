@@ -22,17 +22,16 @@ namespace AppHub.Launcher
         public bool         IsAdmin         => chkAdmin.Checked;
         public List<string> SelectedModules => ModuleCatalog.GetChecked(_chkModules);
 
-        public UserEditDialog()
+        public UserEditDialog(List<KeyValuePair<string, string>> modules)
         {
-            BuildUI();
+            BuildUI(modules);
         }
 
-        private void BuildUI()
+        private void BuildUI(List<KeyValuePair<string, string>> modules)
         {
             this.Text            = "เพิ่มผู้ใช้ใหม่";
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition   = FormStartPosition.CenterParent;
-            this.ClientSize      = new System.Drawing.Size(380, 360);
             this.MaximizeBox     = false;
             this.MinimizeBox     = false;
 
@@ -62,8 +61,9 @@ namespace AppHub.Launcher
                 lblFullName, txtFullName, chkAdmin, lblModules
             });
 
-            _chkModules = ModuleCatalog.CreateCheckBoxes(this, tx, y, null);
-            y += ModuleCatalog.All.Length * 26 + 12;
+            _chkModules = ModuleCatalog.CreateCheckBoxes(this, tx, y, modules, null);
+            y += modules.Count * ModuleCatalog.RowHeight + 12;
+            this.ClientSize = new System.Drawing.Size(380, y + 44);
 
             btnOk = new Button
             {

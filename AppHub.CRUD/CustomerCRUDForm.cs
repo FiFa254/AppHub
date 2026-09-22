@@ -73,7 +73,7 @@ namespace AppHub.CRUD
         {
             using (var dlg = new CustomerEditDialog("เพิ่ม Customer ใหม่"))
             {
-                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                if (ShowModal(dlg) != DialogResult.OK) return;
                 try
                 {
                     SQL.Connect();
@@ -134,7 +134,7 @@ namespace AppHub.CRUD
                 dlg.Address      = row.Cells["Address"].Value?.ToString();
                 dlg.LockCode();
 
-                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                if (ShowModal(dlg) != DialogResult.OK) return;
                 try
                 {
                     SQL.Connect();

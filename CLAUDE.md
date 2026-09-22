@@ -7,7 +7,7 @@
 ## Project Overview
 
 **AppHub** คือ WinForms MDI application (.NET Framework 4.7.2, C#) สำหรับจัดการข้อมูลลูกค้า
-ประกอบด้วย 6 projects ใน Visual Studio Solution เดียว
+ประกอบด้วย 6 projects + 1 test project ใน Visual Studio Solution เดียว
 
 ---
 
@@ -26,7 +26,8 @@ AppHub\
 │   ├── AppSession.cs                  ← Static session state
 │   └── UI\
 │       ├── AppHubForm.cs              ← Base form (ShowError, ShowWarning, Confirm)
-│       └── AppHubCRUDForm.cs          ← Base CRUD form (DGV, LblTitle, LblCount, UpdateCount)
+│       ├── AppHubCRUDForm.cs          ← Base CRUD form (DGV, LblTitle, LblCount, UpdateCount)
+│       └── UiServices.cs              ← จุดเปิด MessageBox / dialog / file picker (test แทนที่ได้)
 │
 ├── AppHub.Launcher\                   ← Startup project (EXE)
 │   ├── AppHub.Launcher.csproj
@@ -52,9 +53,16 @@ AppHub\
 │   ├── AppHub.Report.csproj
 │   └── ReportForm.cs / .Designer.cs
 │
-└── AppHub.Scan\                       ← Module: Scan บัตร/QR
-    ├── AppHub.Scan.csproj
-    └── ScanForm.cs / .Designer.cs
+├── AppHub.Scan\                       ← Module: Scan บัตร/QR
+│   ├── AppHub.Scan.csproj
+│   └── ScanForm.cs / .Designer.cs
+│
+└── AppHub.Tests\                      ← MSTest — ครอบคลุมทุก TC ใน AppHub_TestPlan.md
+    ├── AppHub.Tests.csproj
+    ├── App.config                     ← connection string ของ AppHubDB_Test
+    ├── AppHub.runsettings             ← บังคับ STA thread (WinForms)
+    ├── Infrastructure\                ← TestDb, Ui (reflection), UiTestBase
+    └── *Tests.cs                      ← 1 ไฟล์ต่อ module (TestCategory = TC-xx-nn)
 ```
 
 ### Project GUIDs
@@ -67,6 +75,7 @@ AppHub\
 | AppHub.Report | `{A1B2C3D4-0004-0004-0004-000000000004}` |
 | AppHub.Scan | `{A1B2C3D4-0005-0005-0005-000000000005}` |
 | AppHub.CRUD | `{A1B2C3D4-0006-0006-0006-000000000006}` |
+| AppHub.Tests | `{A1B2C3D4-0007-0007-0007-000000000007}` |
 
 ---
 
@@ -119,6 +128,8 @@ public partial class MyForm : AppHubCRUDForm { }
 - `ShowWarning(message, title)` — MessageBox Warning
 - `ShowInfo(message, title)` — MessageBox Information (แจ้งผลสำเร็จ)
 - `Confirm(message, title)` → `bool` — MessageBox YesNo
+- `ShowModal(dialog)` → `DialogResult` — ใช้แทน `dialog.ShowDialog(this)`
+- `PickOpenFile(filter, title)` / `PickSaveFile(filter, fileName)` → path หรือ `null` — ใช้แทน OpenFileDialog / SaveFileDialog
 - `SetPlaceholder(TextBox, text)` — ข้อความจางใน TextBox (.NET Framework ไม่มี `PlaceholderText`)
 
 **AppHubCRUDForm extras:**
@@ -171,7 +182,8 @@ AppSession.SetPermissions(List<string> codes)
 
 ```sql
 dbo.t_Users         -- User_id, Username, Password_hash (SHA-256), Full_name, Is_admin, Is_active, Created_date
-dbo.t_UserModule    -- User_id, Module_code (CRUD/IMPORT/REPORT/SCAN)
+dbo.t_Modules       -- Module_code (PK), Module_name, Sort_order
+dbo.t_UserModule    -- User_id, Module_code (FK → t_Modules)
 dbo.t_Customers     -- Customer_id, Customer_code (PK), Full_name, Phone, Email, Address, Created_date, Updated_date
 dbo.t_ScanLog       -- Log_id, Customer_code, Scanned_by, Scan_date, Note
 ```
@@ -213,6 +225,15 @@ dbo.t_ScanLog       -- Log_id, Customer_code, Scanned_by, Scan_date, Note
 4. ตั้ง `AppHub.Launcher` เป็น Startup Project
 5. `F5` เพื่อ build และ run
 
+### Run tests
+
+- Visual Studio: `Test → Run All Tests` (ใช้ `AppHub.Tests\AppHub.runsettings` อัตโนมัติ)
+- Command line (หลัง build):
+  ```
+  vstest.console.exe AppHub.Tests\bin\Debug\AppHub.Tests.dll /Settings:AppHub.Tests\AppHub.runsettings /TestAdapterPath:packages\MSTest.TestAdapter.2.2.10\build\_common
+  ```
+- Test ลบและสร้าง `AppHubDB_Test` ใหม่จาก `setup.sql` ทุกครั้ง — ไม่แตะ `AppHubDB`
+
 ---
 
 ## Coding Conventions
@@ -221,6 +242,8 @@ dbo.t_ScanLog       -- Log_id, Customer_code, Scanned_by, Scan_date, Note
 - **Naming:** PascalCase สำหรับ methods/properties, camelCase สำหรับ local variables
 - **Prefix controls:** `txt` = TextBox, `btn` = Button, `lbl` = Label, `dgv` = DataGridView, `chk` = CheckBox, `dtp` = DateTimePicker
 - **Error handling:** ใช้ `ShowError()` เสมอ ไม่ใช้ `MessageBox.Show()` โดยตรง
+- **Modal UI:** ห้ามเรียก `MessageBox.Show` / `ShowDialog` / `OpenFileDialog` ตรงๆ — ใช้ helper ของ `AppHubForm` เพื่อให้ test ดักได้
+- **Test:** แก้ behavior แล้วต้องเพิ่ม/แก้ test ใน `AppHub.Tests` และรันให้ผ่านทั้งหมด
 - **Password:** SHA-256 hash เสมอ ห้าม store plain text
 
 ---
@@ -242,7 +265,7 @@ dbo.t_ScanLog       -- Log_id, Customer_code, Scanned_by, Scan_date, Note
 1. สร้าง project ใหม่ใน `AppHub.NewModule\`
 2. Reference `AppHub.Core`
 3. สร้าง Form ที่ inherit `AppHubForm` หรือ `AppHubCRUDForm`
-4. เพิ่ม Module_code ใหม่ใน `dbo.t_UserModule`
+4. เพิ่ม Module_code ใหม่ใน `dbo.t_Modules` (seed ใน `setup.sql`) — หน้ากำหนดสิทธิ์จะแสดงเอง
 5. เพิ่ม menu item ใน `MainForm` ที่ตรวจ `AppSession.HasPermission("NEWMODULE")`
 
 ### แก้ไข SQL Query

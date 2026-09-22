@@ -25,25 +25,20 @@ namespace AppHub.Import
         // ─── Browse ───────────────────────────────────────────────────────────
         private void btnBrowse_Click(object sender, EventArgs e)
         {
-            using (var dlg = new OpenFileDialog
-            {
-                Filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
-                Title  = "เลือกไฟล์ Excel"
-            })
-            {
-                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+            string path = PickOpenFile("Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*",
+                                       "เลือกไฟล์ Excel");
+            if (path == null) return;
 
-                ResetPreview();
-                if (!string.Equals(Path.GetExtension(dlg.FileName), ".xlsx",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    ShowWarning("กรุณาเลือกไฟล์ .xlsx");
-                    return;
-                }
-
-                txtFile.Text = dlg.FileName;
-                LoadPreview(dlg.FileName);
+            ResetPreview();
+            if (!string.Equals(Path.GetExtension(path), ".xlsx",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                ShowWarning("กรุณาเลือกไฟล์ .xlsx");
+                return;
             }
+
+            txtFile.Text = path;
+            LoadPreview(path);
         }
 
         // ─── Preview ──────────────────────────────────────────────────────────
