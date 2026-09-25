@@ -9,3 +9,8 @@ obj/
 .vs/
 *.user
 *.suo
+
+# ไฟล์ build สำหรับแจกจ่าย
+publish/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
