@@ -56,7 +56,7 @@ namespace AppHub.Launcher
                 new Rectangle(40, 178, Width - 70, 80), Color.FromArgb(219, 234, 254),
                 TextFormatFlags.WordBreak);
 
-            TextRenderer.DrawText(g, "© 2026 AppHub", Theme.Small,
+            TextRenderer.DrawText(g, $"© {System.DateTime.Now.Year} AppHub", Theme.Small,
                 new Point(40, Height - 40), Color.FromArgb(191, 219, 254));
         }
     }

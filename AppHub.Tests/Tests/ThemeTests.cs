@@ -52,9 +52,23 @@ namespace AppHub.Tests
             var form = Open<CustomerCRUDForm>();
 
             Assert.AreEqual(Theme.Primary, Ui.Get<Button>(form, "btnAdd").BackColor);
-            Assert.AreEqual(Theme.Danger,  Ui.Get<Button>(form, "btnDelete").BackColor);
+            Assert.AreEqual(Theme.Surface, Ui.Get<Button>(form, "btnDelete").BackColor);
+            Assert.AreEqual(Theme.Danger,  Ui.Get<Button>(form, "btnDelete").ForeColor);
             Assert.AreEqual(Theme.Surface, Ui.Get<Button>(form, "btnEdit").BackColor);
             Assert.IsTrue(All(form).OfType<Button>().All(b => b.FlatStyle == FlatStyle.Flat));
+        }
+
+        [TestMethod]
+        public void DisabledPrimaryButton_LooksDisabled_UntilEnabled()
+        {
+            var form = Open<AppHub.Import.ImportForm>();
+            var import = Ui.Get<Button>(form, "btnImport");
+
+            Assert.IsFalse(import.Enabled);
+            Assert.AreEqual(Theme.SurfaceAlt, import.BackColor);
+
+            import.Enabled = true;
+            Assert.AreEqual(Theme.Primary, import.BackColor);
         }
 
         [TestMethod]
@@ -113,7 +127,7 @@ namespace AppHub.Tests
 
             var crud = _main.MdiChildren.OfType<CustomerCRUDForm>().Single();
             Assert.AreEqual(FormBorderStyle.None, crud.FormBorderStyle);
-            Assert.AreEqual(Theme.SidebarHover, Ui.Get<Button>(_main, "navCRUD").BackColor, "เมนูที่เปิดอยู่ต้องถูกไฮไลต์");
+            Assert.AreEqual(Theme.SidebarActive, Ui.Get<Button>(_main, "navCRUD").BackColor, "เมนูที่เปิดอยู่ต้องถูกไฮไลต์");
 
             var client = _main.Controls.OfType<MdiClient>().Single();
             Assert.AreEqual(client.ClientSize, crud.Size, "หน้า module ต้องเต็มพื้นที่ทำงาน");
@@ -133,7 +147,7 @@ namespace AppHub.Tests
             Ui.Click(_main, "mnuReport_Click");
             Pump();
 
-            Assert.AreEqual(Theme.SidebarHover, Ui.Get<Button>(_main, "navReport").BackColor);
+            Assert.AreEqual(Theme.SidebarActive, Ui.Get<Button>(_main, "navReport").BackColor);
             Assert.AreEqual(Theme.Sidebar,      Ui.Get<Button>(_main, "navCRUD").BackColor);
         }
 
@@ -174,7 +188,7 @@ namespace AppHub.Tests
 
             Assert.IsInstanceOfType(_main.ActiveMdiChild, typeof(CustomerEditDialog),
                 "dialog ที่ค้างอยู่ต้องขึ้นมาข้างหน้า ไม่งั้นผู้ใช้เจอหน้าที่ถูกล็อกแต่มองไม่เห็น dialog");
-            Assert.AreEqual(Theme.SidebarHover, Ui.Get<Button>(_main, "navCRUD").BackColor,
+            Assert.AreEqual(Theme.SidebarActive, Ui.Get<Button>(_main, "navCRUD").BackColor,
                 "เมนูต้องไฮไลต์หน้าที่เป็นเจ้าของ dialog");
         }
     }

@@ -36,7 +36,7 @@ namespace AppHub.Core.UI
                 Location  = new Point(1, 1),
                 Size      = new Size(dialog.ClientSize.Width - 2, HeaderHeight - 1),
                 Anchor    = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
-                BackColor = Theme.Surface
+                BackColor = Theme.SurfaceAlt
             };
 
             var title = new Label
@@ -96,7 +96,7 @@ namespace AppHub.Core.UI
         private static void DrawBorder(object sender, PaintEventArgs e)
         {
             var f = (Form)sender;
-            using (var pen = new Pen(Color.FromArgb(203, 213, 225)))   // slate-300
+            using (var pen = new Pen(Theme.BorderStrong))   // slate-300
                 e.Graphics.DrawRectangle(pen, 0, 0, f.ClientSize.Width - 1, f.ClientSize.Height - 1);
         }
     }
