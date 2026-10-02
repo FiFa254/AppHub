@@ -210,8 +210,17 @@ namespace AppHub.Core.UI
             b.Cursor                  = Cursors.Hand;
             b.FlatAppearance.BorderSize = 0;
 
+            b.EnabledChanged -= OnButtonEnabledChanged;
+            b.EnabledChanged += OnButtonEnabledChanged;
+
             switch (role)
             {
+                case RolePrimary when !b.Enabled:
+                    Colorize(b, SurfaceAlt, TextMuted, SurfaceAlt, SurfaceAlt);
+                    b.Font = BodyBold;
+                    b.FlatAppearance.BorderSize  = 1;
+                    b.FlatAppearance.BorderColor = Border;
+                    break;
                 case RolePrimary:
                     Colorize(b, Primary, Color.White, PrimaryHover, PrimaryDark);
                     b.Font = BodyBold;
@@ -241,6 +250,12 @@ namespace AppHub.Core.UI
                     break;
             }
             RefreshIcon(b);
+        }
+
+        private static void OnButtonEnabledChanged(object sender, EventArgs e)
+        {
+            var b = (Button)sender;
+            StyleButton(b, ResolveRole(b));
         }
 
         private static void Colorize(Button b, Color back, Color fore, Color hover, Color down)

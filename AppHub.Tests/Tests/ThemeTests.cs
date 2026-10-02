@@ -59,6 +59,19 @@ namespace AppHub.Tests
         }
 
         [TestMethod]
+        public void DisabledPrimaryButton_LooksDisabled_UntilEnabled()
+        {
+            var form = Open<AppHub.Import.ImportForm>();
+            var import = Ui.Get<Button>(form, "btnImport");
+
+            Assert.IsFalse(import.Enabled);
+            Assert.AreEqual(Theme.SurfaceAlt, import.BackColor);
+
+            import.Enabled = true;
+            Assert.AreEqual(Theme.Primary, import.BackColor);
+        }
+
+        [TestMethod]
         public void AcceptButton_IsPrimaryAutomatically()
         {
             var form = Open<ScanForm>();
