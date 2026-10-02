@@ -52,7 +52,8 @@ namespace AppHub.Tests
             var form = Open<CustomerCRUDForm>();
 
             Assert.AreEqual(Theme.Primary, Ui.Get<Button>(form, "btnAdd").BackColor);
-            Assert.AreEqual(Theme.Danger,  Ui.Get<Button>(form, "btnDelete").BackColor);
+            Assert.AreEqual(Theme.Surface, Ui.Get<Button>(form, "btnDelete").BackColor);
+            Assert.AreEqual(Theme.Danger,  Ui.Get<Button>(form, "btnDelete").ForeColor);
             Assert.AreEqual(Theme.Surface, Ui.Get<Button>(form, "btnEdit").BackColor);
             Assert.IsTrue(All(form).OfType<Button>().All(b => b.FlatStyle == FlatStyle.Flat));
         }

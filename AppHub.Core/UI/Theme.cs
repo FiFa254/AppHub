@@ -17,6 +17,7 @@ namespace AppHub.Core.UI
         public static readonly Color Surface      = Color.White;      // การ์ด / toolbar / dialog
         public static readonly Color SurfaceAlt   = Hex(0xF8FAFC);   // หัวตาราง / แถวสลับ
         public static readonly Color Border       = Hex(0xE2E8F0);
+        public static readonly Color BorderStrong = Hex(0xCBD5E1);
         public static readonly Color TextPrimary  = Hex(0x0F172A);
         public static readonly Color TextMuted    = Hex(0x64748B);
         public static readonly Color Primary      = Hex(0x2563EB);
@@ -25,6 +26,7 @@ namespace AppHub.Core.UI
         public static readonly Color PrimarySoft  = Hex(0xDBEAFE);
         public static readonly Color Danger       = Hex(0xDC2626);
         public static readonly Color DangerHover  = Hex(0xB91C1C);
+        public static readonly Color DangerSoft   = Hex(0xFEE2E2);
         public static readonly Color Success      = Hex(0x16A34A);
         public static readonly Color Sidebar      = Hex(0x0F172A);
         public static readonly Color SidebarHover = Hex(0x1E293B);
@@ -214,8 +216,10 @@ namespace AppHub.Core.UI
                     b.Font = BodyBold;
                     break;
                 case RoleDanger:
-                    Colorize(b, Danger, Color.White, DangerHover, DangerHover);
+                    Colorize(b, Surface, Danger, DangerSoft, DangerSoft);
                     b.Font = BodyBold;
+                    b.FlatAppearance.BorderSize  = 1;
+                    b.FlatAppearance.BorderColor = Danger;
                     break;
                 case RoleGhost:
                     Colorize(b, b.Parent?.BackColor ?? Surface, Primary, PrimarySoft, PrimarySoft);
@@ -232,7 +236,7 @@ namespace AppHub.Core.UI
                 default:
                     Colorize(b, Surface, TextPrimary, SurfaceAlt, Border);
                     b.FlatAppearance.BorderSize  = 1;
-                    b.FlatAppearance.BorderColor = Border;
+                    b.FlatAppearance.BorderColor = BorderStrong;
                     break;
             }
             RefreshIcon(b);
@@ -255,8 +259,8 @@ namespace AppHub.Core.UI
             g.ColumnHeadersBorderStyle    = DataGridViewHeaderBorderStyle.None;
             g.EnableHeadersVisualStyles   = false;
             g.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            g.ColumnHeadersHeight         = 40;
-            g.RowTemplate.Height          = 36;
+            g.ColumnHeadersHeight         = 42;
+            g.RowTemplate.Height          = 40;
             g.AllowUserToResizeRows       = false;
             g.RowHeadersVisible           = false;
 
