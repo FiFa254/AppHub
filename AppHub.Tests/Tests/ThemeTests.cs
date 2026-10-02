@@ -114,7 +114,7 @@ namespace AppHub.Tests
 
             var crud = _main.MdiChildren.OfType<CustomerCRUDForm>().Single();
             Assert.AreEqual(FormBorderStyle.None, crud.FormBorderStyle);
-            Assert.AreEqual(Theme.SidebarHover, Ui.Get<Button>(_main, "navCRUD").BackColor, "เมนูที่เปิดอยู่ต้องถูกไฮไลต์");
+            Assert.AreEqual(Theme.SidebarActive, Ui.Get<Button>(_main, "navCRUD").BackColor, "เมนูที่เปิดอยู่ต้องถูกไฮไลต์");
 
             var client = _main.Controls.OfType<MdiClient>().Single();
             Assert.AreEqual(client.ClientSize, crud.Size, "หน้า module ต้องเต็มพื้นที่ทำงาน");
@@ -134,7 +134,7 @@ namespace AppHub.Tests
             Ui.Click(_main, "mnuReport_Click");
             Pump();
 
-            Assert.AreEqual(Theme.SidebarHover, Ui.Get<Button>(_main, "navReport").BackColor);
+            Assert.AreEqual(Theme.SidebarActive, Ui.Get<Button>(_main, "navReport").BackColor);
             Assert.AreEqual(Theme.Sidebar,      Ui.Get<Button>(_main, "navCRUD").BackColor);
         }
 
@@ -175,7 +175,7 @@ namespace AppHub.Tests
 
             Assert.IsInstanceOfType(_main.ActiveMdiChild, typeof(CustomerEditDialog),
                 "dialog ที่ค้างอยู่ต้องขึ้นมาข้างหน้า ไม่งั้นผู้ใช้เจอหน้าที่ถูกล็อกแต่มองไม่เห็น dialog");
-            Assert.AreEqual(Theme.SidebarHover, Ui.Get<Button>(_main, "navCRUD").BackColor,
+            Assert.AreEqual(Theme.SidebarActive, Ui.Get<Button>(_main, "navCRUD").BackColor,
                 "เมนูต้องไฮไลต์หน้าที่เป็นเจ้าของ dialog");
         }
     }

@@ -30,8 +30,9 @@ namespace AppHub.Core.UI
         public static readonly Color Success      = Hex(0x16A34A);
         public static readonly Color Sidebar      = Hex(0x0F172A);
         public static readonly Color SidebarHover = Hex(0x1E293B);
+        public static readonly Color SidebarActive = Hex(0x1E3A8A);
         public static readonly Color SidebarText  = Hex(0xCBD5E1);
-        public static readonly Color SidebarMuted = Hex(0x64748B);
+        public static readonly Color SidebarMuted = Hex(0x94A3B8);
 
         // ─── Typography ──────────────────────────────────────────────────────
         public static readonly Font Body     = new Font("Segoe UI", 9F);

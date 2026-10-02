@@ -291,7 +291,7 @@ namespace AppHub.Launcher
             _activeNav = nav;
             if (_activeNav != null)
             {
-                _activeNav.BackColor = Theme.SidebarHover;
+                _activeNav.BackColor = Theme.SidebarActive;
                 _activeNav.ForeColor = Color.White;
                 Theme.RefreshIcon(_activeNav);
                 _activeNav.Invalidate();
